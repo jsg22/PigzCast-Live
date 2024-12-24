@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PigzCast Live</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background: #ff4757;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+        }
+        nav {
+            display: flex;
+            justify-content: space-around;
+            background: #2f3542;
+            padding: 10px 0;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+        }
+        .container {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .video-upload, .account-section, .donation-section {
+            margin: 20px 0;
+        }
+        .video-upload input[type="text"], .account-section input[type="text"], .donation-section input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .video-upload button, .account-section button, .donation-section button {
+            padding: 10px 20px;
+            background-color: #ff4757;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .video-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>PigzCast Live</h1>
+</header>
+
+<nav>
+    <a href="#" onclick="showHome()">Home</a>
+    <a href="#" onclick="showUpload()">Upload</a>
+    <a href="#" onclick="showAccount()">Account</a>
+    <a href="#" onclick="showDonation()">Donations</a>
+    <a href="#" onclick="signOut()">Sign Out</a>
+</nav>
+
+<div class="container">
+    <div id="home" class="page">
+        <h2>Welcome to PigzCast Live!</h2>
+        <div class="video-list" id="videoList">
+            <!-- Example embedded videos can be added here -->
+        </div>
+    </div>
+
+    <div id="upload" class="page" style="display: none;">
+        <h2>Embed a Video or Stream</h2>
+        <input type="text" id="videoURL" placeholder="Enter video or stream embed URL">
+        <button onclick="embedVideo()">Embed Video</button>
+    </div>
+
+    <div id="account" class="page" style="display: none;">
+        <h2>Account Management</h2>
+        <div id="accountStatus"></div>
+        <input type="text" id="userName" placeholder="Enter your name">
+        <input type="password" id="password" placeholder="Enter your password">
+        <button onclick="signIn()">Sign In</button>
+        <button onclick="signUp()">Sign Up</button>
+        <div id="status"></div>
+    </div>
+
+    <div id="donation" class="page" style="display: none;">
+        <h2>Donation Section</h2>
+        <input type="text" id="donationLink" placeholder="Enter your PayPal donation link">
+        <button onclick="addDonationLink()">Add Donation Link</button>
+        <div id="donationStatus"></div>
+    </div>
+</div>
+
+<script>
+    let currentUser = null;
+    let donationLink = '';
+
+    function showHome() {
+        document.getElementById('home').style.display = 'block';
+        document.getElementById('upload').style.display = 'none';
+        document.getElementById('account').style.display = 'none';
+        document.getElementById('donation').style.display = 'none';
+    }
+
+    function showUpload() {
+        document.getElementById('home').style.display = 'none';
+        document.getElementById('upload').style.display = 'block';
+        document.getElementById('account').style.display = 'none';
+        document.getElementById('donation').style.display = 'none';
+    }
+
+    function showAccount() {
+        document.getElementById('home').style.display = 'none';
+        document.getElementById('upload').style.display = 'none';
+        document.getElementById('account').style.display = 'block';
+        document.getElementById('donation').style.display = 'none';
+        document.getElementById('accountStatus').innerText = currentUser ? `Logged in as ${currentUser}` : '';
+    }
+
+    function showDonation() {
+        document.getElementById('home').style.display = 'none';
+        document.getElementById('upload').style.display = 'none';
+        document.getElementById('account').style.display = 'none';
+        document.getElementById('donation').style.display = 'block';
+    }
+
+    function embedVideo() {
+        const videoURL = document.getElementById('videoURL').value;
+        const videoList = document.getElementById('videoList');
+
+        if (videoURL) {
+            const videoContainer = document.createElement('div');
+            videoContainer.classList.add('video-container');
+
+            const iframe = document.createElement('iframe');
+            iframe.src = videoURL.replace("watch?v=", "embed/").replace("youtu.be/", "youtube.com/embed/");
+            iframe.frameBorder = 0;
+            iframe.allowFullscreen = true;
+
+            videoContainer.appendChild(iframe);
+            videoList.appendChild(videoContainer);
+            document.getElementById('videoURL').value = ''; // Clear input
+        } else {
+            alert("Please enter a valid video URL.");
+        }
+    }
+
+    function signIn() {
+        const nameInput = document.getElementById('userName').value;
+        const passwordInput = document.getElementById('password').value;
+
+        if (nameInput && passwordInput) {
+            // Simulate sign-in
+            currentUser = nameInput; // Here you would normally check against a database
+            document.getElementById('status').innerText = `Welcome, ${currentUser}!`;
+            document.getElementById('userName').value = '';
+            document.getElementById('password').value = '';
+            showHome(); // Go to home after signing in
+        } else {
+            alert("Please enter your name and password.");
+        }
+    }
+
+    function signUp() {
+        const nameInput = document.getElementById('userName').value;
+        const passwordInput = document.getElementById('password').value;
+
+        if (nameInput && passwordInput) {
+            // Simulate sign-up
+            document.getElementById('status').innerText = `Account created for ${nameInput}!`;
+            document.getElementById('userName').value = '';
+            document.getElementById('password').value = '';
+        } else {
+            alert("Please enter your name and password.");
+        }
+    }
+
+    function addDonationLink() {
+        const linkInput = document.getElementById('donationLink').value;
+        if (linkInput) {
+            donationLink = linkInput;
+            document.getElementById('donationStatus').innerHTML = `Donation link added: <a href="${donationLink}" target="_blank">${donationLink}</a>`;
+            document.getElementById('donationLink').value = ''; // Clear input
+        } else {
+            alert("Please enter a valid PayPal donation link.");
+        }
+    }
+
+    function signOut() {
+        currentUser = null;
+        donationLink = '';
+        document.getElementById('status').innerText = 'Signed out.';
+        document.getElementById('donationStatus').innerHTML = '';
+        showHome(); // Go back to home
+    }
+</script>
+
+</body>
+</html>
